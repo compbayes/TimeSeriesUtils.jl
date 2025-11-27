@@ -22,11 +22,8 @@ Examples:
 ```julia-repl
 
 julia> T = 10*12; 
-
 julia> x = 0.01*(1:T) .+ sin.((1:T)*(2pi/12)) .+ 0.2*randn(T)
-
 julia> stl_object = stl(x, frequency = 12)
-
 julia> stl_object
 ```
 
@@ -50,11 +47,8 @@ R function that decompose a time series into seasonal, trend and irregular compo
 Examples:
 ```julia-repl
 julia> T = 10*12; 
-
 julia> x = 0.01*(1:T) .+ sin.((1:T)*(2pi/12)) .+ sin.((1:T)*(2pi/365.25)) .+ 0.2*randn(T)
-
 julia> mstl_object = mstl(x; seasonal_periods = [12,365.25])
-
 julia> mstl_object
 ```
 
