@@ -408,3 +408,31 @@ function SpecDensMultiSARMA(ω::AbstractVector, ϕ, θ, σ², s)
 
 	return specDens
 end 
+
+
+""" 
+    SpecDensARTFIMA(ω, ϕ, θ, d, λ, σ²) 
+
+Compute spectral density for the univariate ARTFIMA model over domain ω ∈ [-π,π]. 
+
+- ω is a radial frequency
+- ϕ is a vector of AR coefficients
+- θ is a vector of MA coefficients
+- d is the fractional differenting parameter
+- λ ≥ 0 is the tempering parameter 
+- σ² is the noise variance
+
+# Examples
+The spectral density for an AR(1) process with unit noise variance is
+```doctests 
+julia> SpecDensARTFIMA(0.5, 0.9, 0, 0, 0, 1)
+0.6909224383713601
+```
+""" 
+function SpecDensARTFIMA(ω, ϕ, θ, d, λ, σ²)
+    ARpoly =  Polynomial([1;-ϕ], :z)
+    MApoly =  Polynomial([1;θ], :z) 
+    specDens = (σ²/(2π))*(abs(MApoly(exp(-im*ω)))^2/abs(ARpoly(exp(-im*ω)))^2)*
+		abs(1-exp(-(λ+im*ω)))^(-2*d)
+	return specDens
+end 

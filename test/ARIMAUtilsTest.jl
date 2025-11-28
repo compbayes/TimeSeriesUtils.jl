@@ -10,4 +10,11 @@
     @test SpecDensMultiSARMA(ω₁, 0, 0, σ², s) == SpecDensMultiSARMA(ω₂, 0, 0, σ², s) == 
         σ²/(2π)
 
+    @test SpecDensARTFIMA(ω₁, 0.0, 0, 0, 0, σ²) == SpecDensARTFIMA(ω₂, 0.0, 0, 0, 0, σ²) ==
+        σ²/(2π)
+
+    # ARIMA is a special case of ARTFIMA
+    @test SpecDensARMA(0.42, [0.5,-0.2], [0.5,-0.2], 0.25) == 
+        SpecDensARTFIMA(0.42, [0.5,-0.2], [0.5,-0.2], 0, 0, 0.25)
+
 end

@@ -5,6 +5,5 @@ using Test
 
 include("GeneralUtilsTest.jl")
 include("ARIMAUtilsTest.jl")
-include("ARTFIMAUtilsTest.jl")
 include("SpectralUtilsTest.jl")
 
