@@ -6,7 +6,7 @@ using RCall
 
 # Installing some R package, if not already installed.
 R"if (suppressMessages(!require('forecast'))) 
-install.packages('forecast', repo = 'http://cran.us.r-project.org')"
+install.packages('forecast', repo = 'http://cran.r-project.org')"
 
 R"if (suppressMessages(!require('psd'))) 
 install.packages('psd', repo = 'http://cran.r-project.org')"
