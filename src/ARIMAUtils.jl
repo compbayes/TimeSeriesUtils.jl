@@ -20,18 +20,37 @@ function ARMAacf(; ϕ = [], θ = [], maxlag = maximum(length(ϕ), length(θ)+1),
     return ARMAacf
 end
 
+""" 
+    hardtanh(x, ε = 0.0001) 
 
+Hard tanh function that maps x linearly to the interval (-1 + ε, 1 - ε). 
+
+# Examples
+```julia-repl
+julia> hardtanh(0.4, 0.0001)
+0.4
+julia> hardtanh(1, 0.0001)
+0.9999
+julia> hardtanh(-1.1, 0.0001)
+-0.9999
+```
+""" 
+function hardtanh(x, ε = 0.0001)
+    return (x <= -1) ? -(1-ε) : (x>= 1) ? (1-ε) : x
+end
 
 """ 
     arma_reparam(x::Vector [, pacf_map = "monahan", negative_signs = true]) 
 
 Takes a p-dim vector `x` and returns parameters restricted to the have roots outside the unit circle, i.e. stationary(AR) or invertible (MA). The mapping is performed via the partial autocorrelations, P as: x -> P -> ϕ.
 
-If `pacf_map == "sigmoid"`, then the partial autocorrelations are parameterized as 
-    P = (exp(x) - 1) / (exp(x) + 1 )
+If `pacf_map == "tanh"`, then the partial autocorrelations are parameterized as 
+    P = tanh(x)
 
 If `pacf_map == "monahan"`, then the partial autocorrelations are parameterized as 
     P = x/√(1 + x²) 
+
+If `pacf_map == "hardtanh"`, then the partial autocorrelations are parameterized as hardtanh
 
 If `negative_signs == true` 
 coefficients are for polynomial 1 - ϕ₁B - ϕ₂B² - .... which is typically used for AR\\
@@ -49,22 +68,19 @@ julia> check_stationarity(ϕ)[1] # second element would return the eigenvalues
 true
 ```
 """ 
-function arma_reparam(x; pacf_map = "monahan", threshold = nothing, negative_signs = true)
+function arma_reparam(x; pacf_map = "monahan", negative_signs = true)
     
     p = length(x)
-    if pacf_map == "sigmoid"
-        P = (exp.(x) .- 1) ./ (exp.(x) .+ 1 )
-        P[x .>= 700] = (1 .- exp.(-x[x .>= 700])) ./ (1 .+ exp.(-x[x .>= 700]))
+    if pacf_map == "tanh"
+        P = tanh.(x)
     elseif pacf_map == "monahan"
         P = x./sqrt.(1 .+ x.^2)
+    elseif pacf_map == "hardtanh"
+        P = hardtanh.(x)
     elseif pacf_map == "linear" # No transformation
         return x, NaN
     else
-        error("pacf_map must be either 'sigmoid' or 'monahan'")
-    end
-
-    if !isnothing(threshold)
-        P = clamp.(P, -threshold, threshold)
+        error("pacf_map must be either 'tanh', 'monahan', 'relu' or 'linear'")
     end
     
     if negative_signs 
@@ -130,13 +146,13 @@ function check_stationarity(ϕ::Vector)
 end
 
 """ 
-    sarma_reparam(θ::Vector, Θ::Vector, s, activeLags; pacf_map = "monahan", threshold = nothing, negative_signs = true) 
+    sarma_reparam(θ::Vector, Θ::Vector, s, activeLags; pacf_map = "monahan", negative_signs = true) 
 
 Takes a p-dim vector `θ` with regular AR/MA coefficients and a P-dim vector with seasonal AR/MA coefficients `Θ` (with season `s`) and returns the *non-zero* coefficients in the product polynomial 
 (1 - ϕ₁B - ϕ₂B² - ....)(1 - Φ₁B - Φ₂B² - ....) = (1 - ψ₁B - Ψ₂B² - ....) 
 where both sets of parameters (ϕ and Φ) are restricted to the have roots outside the unit circle, i.e. stationary(AR) or invertible (MA). The mapping is performed via the partial autocorrelations, P as: θ -> P₁ -> ϕ and Θ -> P₂ -> Φ. 
 
-If `pacf_map == "sigmoid"`, then the partial autocorrelations are parameterized as 
+If `pacf_map == "tanh"`, then the partial autocorrelations are parameterized as 
     P = (exp(x) - 1) / (exp(x) + 1 )
 
 If `pacf_map == "monahan"`, then the partial autocorrelations are parameterized as 
@@ -149,18 +165,15 @@ coefficients are for polynomial
         1 + ϕ₁B + ϕ₂B² + .... which is typically used for MA
 
 """ 
-function sarma_reparam(θ, Θ, s, activeLags = nothing; pacf_map = "monahan", 
-        threshold = nothing, negative_signs = true)
+function sarma_reparam(θ, Θ, s, activeLags = nothing; pacf_map = "monahan", negative_signs = true)
 
     p = length(θ)
     P = length(Θ)
     if isnothing(activeLags)
         activeLags = FindActiveLagsSAR(p, P, s)
     end
-    ϕ = arma_reparam(θ; pacf_map = pacf_map, threshold = threshold, 
-        negative_signs = negative_signs)[1] .+ eps()
-    Φ = arma_reparam(Θ; pacf_map = pacf_map, threshold = threshold, 
-        negative_signs = negative_signs)[1] .+ eps()
+    ϕ = arma_reparam(θ; pacf_map = pacf_map, negative_signs = negative_signs)[1] .+ eps()
+    Φ = arma_reparam(Θ; pacf_map = pacf_map, negative_signs = negative_signs)[1] .+ eps()
     ARpoly =  Polynomial([1;-ϕ], :z)
     ARseasonpolymat = [zeros(s-1,P);-Φ']; 
     ARseasonpoly =  Polynomial([1;ARseasonpolymat[:]], :z)
