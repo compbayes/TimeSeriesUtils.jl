@@ -1,6 +1,6 @@
 module TimeSeriesUtils
 
-using Plots, Distributions, FFTW, Polynomials
+using Plots, Distributions, FFTW, Polynomials, LinearAlgebra
 using LaTeXStrings
 using RCall
 
