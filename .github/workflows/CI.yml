@@ -34,6 +34,10 @@ jobs:
         with:
           use-public-rspm: true
           r-version: 'oldrel'   # or a fixed version if you prefer
+      - name: Install system dependencies for R packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev pkg-config libssl-dev libxml2-dev
       - name: Install R packages for RCall
         run: |
           echo "LD_LIBRARY_PATH=$(R RHOME)/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
@@ -67,6 +71,10 @@ jobs:
         with:
           use-public-rspm: true
           r-version: 'oldrel'
+      - name: Install system dependencies for R packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev pkg-config libssl-dev libxml2-dev
       - name: Install R packages for RCall
         run: |
           echo "LD_LIBRARY_PATH=$(R RHOME)/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
