@@ -12,4 +12,5 @@ SpecDensARMA
 SpecDensSARMA
 SpecDensMultiSARMA
 SpecDensARTFIMA
+TimeSeriesUtils.hardtanh
 ```
