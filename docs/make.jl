@@ -2,6 +2,7 @@ using Pkg
 
 # Activate the docs environment in docs/Project.toml
 Pkg.activate(@__DIR__)
+Pkg.develop(PackageSpec(path=pwd()))
 Pkg.instantiate()  # optional but good to keep
 
 @show Base.active_project()  # temporary debug, can be removed later
@@ -16,7 +17,7 @@ makedocs(;
     authors="Mattias Villani",
     sitename="TimeSeriesUtils.jl",
     format=Documenter.HTML(;
-        canonical="https://mattiasvillani.github.io/TimeSeriesUtils.jl",
+        canonical="https://compbayes.github.io/TimeSeriesUtils.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -29,6 +30,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/mattiasvillani/TimeSeriesUtils.jl",
+    repo="github.com/compbayes/TimeSeriesUtils.jl",
     devbranch="main",
 )
