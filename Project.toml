@@ -1,7 +1,7 @@
 name = "TimeSeriesUtils"
-uuid = "20aa821e-5b1c-4f19-affd-90757a4fca77"
-version = "1.0.0-DEV"
-authors = ["Mattias Villani"]
+uuid = "9b4376eb-4c39-48cb-a63b-9dcc3f2fabba"
+version = "1.0.0"
+authors = ["Mattias Villani", "Oskar Gustafsson"]
 
 [deps]
 ARCHModels = "6d3278bc-c23a-5105-85e5-0d57d2bf684f"
